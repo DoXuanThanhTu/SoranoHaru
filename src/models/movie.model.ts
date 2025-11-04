@@ -29,7 +29,7 @@ export interface IMovie extends Document {
   breadcrumbs?: object[];
 }
 
-const MovieSchema: Schema = new Schema(
+const MovieSchema = new Schema(
   {
     slug: { type: String, required: true },
     name: { type: String, required: true },
@@ -57,6 +57,12 @@ const MovieSchema: Schema = new Schema(
     latestEpisode: String,
     seo: Object,
     breadcrumbs: [Object],
+
+    // 🔽 Các trường mới thêm:
+    featured: { type: Boolean, default: false }, // phim đề cử
+    isFavorite: { type: Boolean, default: false }, // được yêu thích
+    viewsToday: { type: Number, default: 0 },
+    viewsMonth: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

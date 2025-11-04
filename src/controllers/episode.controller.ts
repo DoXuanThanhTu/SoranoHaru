@@ -110,45 +110,53 @@ export const addEpisodeToServerData = async (req: Request, res: Response) => {
       serverData,
     } = req.body;
 
-    if (!movieId || !serverName || !serverData || !Array.isArray(serverData)) {
+    if (!movieId || !serverName || !Array.isArray(serverData)) {
       return res
         .status(400)
-        .json({ message: "Missing required fields or serverData is invalid" });
+        .json({ message: "Missing required fields or invalid serverData" });
     }
 
-    // Lấy document Episode hiện tại cho server
+    const normalizedServerData = serverData.map((ep) => ({
+      name: ep.name || "",
+      slug: ep.slug || ep.name || "",
+      filename: ep.filename || "",
+      linkEmbed: ep.link_embed || ep.linkEmbed || "",
+      linkM3u8: ep.link_m3u8 || ep.linkM3u8 || "",
+    }));
+
     let episodeDoc = await Episode.findOne({ movieId, serverName });
 
     if (!episodeDoc) {
-      // Nếu chưa có document cho server này, tạo mới
       episodeDoc = new Episode({
         movieId,
         serverName,
         isAI,
         priority,
-        serverData,
+        serverData: normalizedServerData,
       });
       await episodeDoc.save();
-      return res
-        .status(201)
-        .json({
-          message: "Server created with new episode(s)",
-          episode: episodeDoc,
-        });
+      return res.status(201).json({
+        message: "Server created with new episode(s)",
+        episode: episodeDoc,
+      });
     }
 
-    // Duyệt từng tập trong serverData gửi lên
-    for (const newEp of serverData) {
-      const exists = episodeDoc.serverData.some((ep) => ep.slug === newEp.slug);
-      if (!exists) {
+    for (const newEp of normalizedServerData) {
+      const existing = episodeDoc.serverData.find(
+        (ep) => ep.slug === newEp.slug
+      );
+      if (existing) {
+        Object.assign(existing, newEp); // update nếu trùng slug
+      } else {
         episodeDoc.serverData.push(newEp);
       }
     }
 
     await episodeDoc.save();
-    res
-      .status(200)
-      .json({ message: "Episode(s) added successfully", episode: episodeDoc });
+    res.status(200).json({
+      message: "Episode(s) added/updated successfully",
+      episode: episodeDoc,
+    });
   } catch (error) {
     console.error("Error adding episode(s):", error);
     res.status(500).json({ message: "Internal server error" });

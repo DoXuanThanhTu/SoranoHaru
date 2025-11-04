@@ -1,6 +1,7 @@
 import express, { json, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import connectDB from "./db";
+import "./utils/cronJobs";
 import movieRoute from "./routes/movie.routes";
 import categoryRoute from "./routes/category.routes";
 import episodeRoute from "./routes/episode.routes";

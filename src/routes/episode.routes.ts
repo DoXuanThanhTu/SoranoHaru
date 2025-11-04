@@ -6,18 +6,22 @@ import {
   getEpisodesByMovieId,
   updateEpisode,
   deleteEpisode,
+  addEpisodeToServerData,
 } from "../controllers/episode.controller";
 
 const router = express.Router();
 
-// CRUD routes
+// 🔹 Route đặc biệt nên đặt TRƯỚC :id
+router.get("/movies/:movieId", getEpisodesByMovieId);
+
+// CRUD cơ bản
 router.post("/", createEpisode);
 router.get("/", getAllEpisodes);
 router.get("/:id", getEpisodeById);
 router.put("/:id", updateEpisode);
 router.delete("/:id", deleteEpisode);
 
-// Lấy tất cả episode của 1 movie
-router.get("/movies/:movieId", getEpisodesByMovieId);
+// 🔹 Route thêm tập nhanh (paste JSON / thủ công)
+router.post("/add-single", addEpisodeToServerData);
 
 export default router;
