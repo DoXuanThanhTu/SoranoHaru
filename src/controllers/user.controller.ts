@@ -17,11 +17,9 @@ export const registerUser = async (
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      res
-        .status(400)
-        .json({
-          message: "Thiếu thông tin bắt buộc (username, email, password)",
-        });
+      res.status(400).json({
+        message: "Thiếu thông tin bắt buộc (username, email, password)",
+      });
       return;
     }
 
@@ -98,7 +96,7 @@ export const getAllUsers = async (
   res: Response
 ): Promise<void> => {
   try {
-    if (req.user.role !== "admin") {
+    if (req.user?.role !== "admin") {
       res
         .status(403)
         .json({ message: "Chỉ admin mới có quyền xem danh sách người dùng" });
@@ -145,7 +143,7 @@ export const updateUser = async (
     const targetId = req.params.id;
 
     // Chỉ cho phép người dùng tự cập nhật hoặc admin
-    if (req.user._id.toString() !== targetId && req.user.role !== "admin") {
+    if (req.user?._id.toString() !== targetId && req.user?.role !== "admin") {
       res
         .status(403)
         .json({ message: "Không có quyền cập nhật người dùng này" });
@@ -181,7 +179,7 @@ export const deleteUser = async (
   res: Response
 ): Promise<void> => {
   try {
-    if (req.user.role !== "admin") {
+    if (req.user?.role !== "admin") {
       res
         .status(403)
         .json({ message: "Chỉ admin mới có quyền xóa người dùng" });
