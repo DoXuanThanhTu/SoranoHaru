@@ -46,8 +46,12 @@ export default function AdminLogin() {
       }
 
       router.push("/admin/dashboard");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Lỗi không xác định");
+      }
     } finally {
       setLoading(false);
     }

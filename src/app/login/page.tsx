@@ -27,8 +27,12 @@ export default function LoginPage() {
       router.push("/");
 
       router.push("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Đăng nhập thất bại");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Đăng nhập thất bại");
+      }
     } finally {
       setLoading(false);
     }

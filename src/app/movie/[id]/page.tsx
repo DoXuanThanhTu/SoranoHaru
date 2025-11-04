@@ -7,6 +7,19 @@ import { Play, Heart, Plus, Share2, MessageCircle } from "lucide-react";
 import CommentSection from "@/components/CommentSection";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+interface EpisodeServer {
+  serverName: string;
+  serverData: Episode[];
+}
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+}
+
+interface RelatedMoviesResponse {
+  movies: MovieDetail[];
+}
 
 interface Episode {
   name: string;
@@ -57,7 +70,7 @@ const MovieDetailPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const movieRes = await axios.get(`${API_URL}/movies/${movieId}`);
-        const episodeRes = await axios.get(
+        const episodeRes = await axios.get<EpisodeServer[]>(
           `${API_URL}/episodes/movies/${movieId}`
         );
 
@@ -66,7 +79,7 @@ const MovieDetailPage: React.FC = () => {
 
         // Flatten episodes
         const allEpisodes: Episode[] = [];
-        episodeRes.data.forEach((s: any) => {
+        episodeRes.data.forEach((s) => {
           allEpisodes.push(...s.serverData);
         });
         setEpisodes(allEpisodes);
@@ -74,12 +87,12 @@ const MovieDetailPage: React.FC = () => {
         // Fetch related movies (same category)
         if (movieData.categoryIds?.length > 0) {
           const firstCategorySlug = movieData.categoryIds[0].slug;
-          const relatedRes = await axios.get(
+          const relatedRes = await axios.get<RelatedMoviesResponse>(
             `${API_URL}/categories/${firstCategorySlug}/movies`
           );
           // Lọc ra chính phim hiện tại
           const filtered = relatedRes.data.movies.filter(
-            (m: any) => m._id !== movieId
+            (m: MovieDetail) => m._id !== movieId
           );
           setRelatedMovies(filtered.slice(0, 8));
         }
@@ -145,7 +158,7 @@ const MovieDetailPage: React.FC = () => {
 
           {/* Thể loại / quốc gia */}
           <div className="flex flex-wrap gap-2 mt-2">
-            {movie.categoryIds?.map((cat: any) => (
+            {movie.categoryIds?.map((cat: Category) => (
               <Link
                 key={cat._id}
                 href={`/category/${cat.slug}`}
