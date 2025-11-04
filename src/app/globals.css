@@ -1,0 +1,6 @@
+@import "tailwindcss";
+html,
+body {
+  @apply bg-gray-950 text-white min-h-screen;
+  background-color: rgb(3 7 18); /* fallback khi Tailwind chưa load */
+}
